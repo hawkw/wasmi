@@ -839,6 +839,7 @@ macro_rules! call_math {
 #[cfg(not(feature = "std"))]
 macro_rules! call_math {
     ($op:ident, $e:expr, $fXX:ident, $FXXExt:ident) => {
+        // FIXME: libm 0.2.0 removed the FXXExt traits
         ::libm::$FXXExt::$op($e)
     };
 }

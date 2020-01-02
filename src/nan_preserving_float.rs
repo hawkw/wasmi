@@ -63,10 +63,6 @@ macro_rules! float {
                 $for(self.0 & !$sign_bit)
             }
 
-            pub fn fract(self) -> Self {
-                FloatCore::fract(self.to_float()).into()
-            }
-
             pub fn min(self, other: Self) -> Self {
                 Self::from(self.to_float().min(other.to_float()))
             }
@@ -118,6 +114,28 @@ macro_rules! float {
 
 float!(F32, u32, f32);
 float!(F64, u64, f64);
+
+impl F32 {
+    #[cfg(feature = "std")]
+    pub fn fract(self) -> Self {
+        self.to_float().fract().into()
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn fract(self) -> Self {
+        (self.to_float() - libm::truncf(self.to_float())).into()
+    }
+}
+
+impl F64 {
+    #[cfg(feature = "std")]
+    pub fn fract(self) -> Self {
+        self.to_float().fract().into()
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn fract(self) -> Self {
+        (self.to_float() - libm::trunc(self.to_float())).into()
+    }
+}
 
 impl From<u32> for F32 {
     fn from(other: u32) -> Self {

@@ -124,7 +124,9 @@ use std::error;
 #[cfg(not(feature = "std"))]
 extern crate libm;
 
+#[cfg(feature = "std")]
 extern crate num_rational;
+
 extern crate num_traits;
 
 /// Error type which can be thrown by wasm code or by host environment.
