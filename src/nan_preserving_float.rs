@@ -115,9 +115,7 @@ impl_binop!(F64, f64, Rem, rem);
 impl<T: Into<F32>> Rem<T> for F32 {
     type Output = Self;
     fn rem(self, other: T) -> Self {
-        F32::from_bits(
-            libm::fmodf(self.to_float(), other.into().to_float()).to_bits()
-        )
+        F32::from_bits(libm::fmodf(self.to_float(), other.into().to_float()).to_bits())
     }
 }
 
@@ -125,9 +123,7 @@ impl<T: Into<F32>> Rem<T> for F32 {
 impl<T: Into<F64>> Rem<T> for F64 {
     type Output = Self;
     fn rem(self, other: T) -> Self {
-        F64::from_bits(
-            libm::fmod(self.to_float(), other.into().to_float()).to_bits()
-        )
+        F64::from_bits(libm::fmod(self.to_float(), other.into().to_float()).to_bits())
     }
 }
 
