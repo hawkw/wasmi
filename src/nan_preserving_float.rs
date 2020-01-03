@@ -36,7 +36,6 @@ macro_rules! float {
         impl_binop!($for, $is, Sub, sub);
         impl_binop!($for, $is, Mul, mul);
         impl_binop!($for, $is, Div, div);
-        impl_binop!($for, $is, Rem, rem);
 
         impl $for {
             pub fn from_bits(other: $rep) -> Self {
@@ -61,14 +60,6 @@ macro_rules! float {
 
             pub fn abs(self) -> Self {
                 $for(self.0 & !$sign_bit)
-            }
-
-            pub fn min(self, other: Self) -> Self {
-                Self::from(self.to_float().min(other.to_float()))
-            }
-
-            pub fn max(self, other: Self) -> Self {
-                Self::from(self.to_float().max(other.to_float()))
             }
         }
 
@@ -115,6 +106,31 @@ macro_rules! float {
 float!(F32, u32, f32);
 float!(F64, u64, f64);
 
+#[cfg(feature = "std")]
+impl_binop!(F32, f32, Rem, rem);
+#[cfg(feature = "std")]
+impl_binop!(F64, f64, Rem, rem);
+
+#[cfg(not(feature = "std"))]
+impl<T: Into<F32>> Rem<T> for F32 {
+    type Output = Self;
+    fn rem(self, other: T) -> Self {
+        F32::from_bits(
+            libm::fmodf(self.to_float(), other.into().to_float()).to_bits()
+        )
+    }
+}
+
+#[cfg(not(feature = "std"))]
+impl<T: Into<F64>> Rem<T> for F64 {
+    type Output = Self;
+    fn rem(self, other: T) -> Self {
+        F64::from_bits(
+            libm::fmod(self.to_float(), other.into().to_float()).to_bits()
+        )
+    }
+}
+
 impl F32 {
     #[cfg(feature = "std")]
     pub fn fract(self) -> Self {
@@ -123,6 +139,24 @@ impl F32 {
     #[cfg(not(feature = "std"))]
     pub fn fract(self) -> Self {
         (self.to_float() - libm::truncf(self.to_float())).into()
+    }
+
+    #[cfg(feature = "std")]
+    pub fn min(self, other: Self) -> Self {
+        Self::from(self.to_float().min(other.to_float()))
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn min(self, other: Self) -> Self {
+        Self::from(libm::fminf(self.to_float(), other.to_float()))
+    }
+
+    #[cfg(feature = "std")]
+    pub fn max(self, other: Self) -> Self {
+        Self::from(self.to_float().max(other.to_float()))
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn max(self, other: Self) -> Self {
+        Self::from(libm::fmaxf(self.to_float(), other.to_float()))
     }
 }
 
@@ -134,6 +168,24 @@ impl F64 {
     #[cfg(not(feature = "std"))]
     pub fn fract(self) -> Self {
         (self.to_float() - libm::trunc(self.to_float())).into()
+    }
+
+    #[cfg(feature = "std")]
+    pub fn min(self, other: Self) -> Self {
+        Self::from(self.to_float().min(other.to_float()))
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn min(self, other: Self) -> Self {
+        Self::from(libm::fmin(self.to_float(), other.to_float()))
+    }
+
+    #[cfg(feature = "std")]
+    pub fn max(self, other: Self) -> Self {
+        Self::from(self.to_float().max(other.to_float()))
+    }
+    #[cfg(not(feature = "std"))]
+    pub fn max(self, other: Self) -> Self {
+        Self::from(libm::fmax(self.to_float(), other.to_float()))
     }
 }
 

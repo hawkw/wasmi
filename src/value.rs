@@ -354,14 +354,40 @@ impl_wrap_into!(i64, i16);
 impl_wrap_into!(i64, i32);
 impl_wrap_into!(i64, f32, F32);
 impl_wrap_into!(u64, f32, F32);
-// Casting from an f64 to an f32 will produce the closest possible value (rounding strategy unspecified)
-// NOTE: currently this will cause Undefined Behavior if the value is finite but larger or smaller than the
-// largest or smallest finite value representable by f32. This is a bug and will be fixed.
-impl_wrap_into!(f64, f32);
+
+impl WrapInto<f32> for f64 {
+    // FIXME - MYCELIUM:
+    // compiler-intrinsics doesn't have the soft-float narrowing conversions
+    // implemented, so we have to do it ourselves.
+    #[cfg(all(target_os = "none", target_arch = "x86_64"))]
+    fn wrap_into(self) -> f32 {
+        let double = self.to_bits();
+        let float: u32;
+        unsafe {
+            asm!("
+                movq xmm0, rdi
+                cvtsd2ss xmm0, xmm0
+                movd eax, xmm0"
+                : "={eax}"(float)
+                : "{rdi}"(double)
+                :: "intel"
+            );
+        }
+        f32::from_bits(float)
+    }
+
+    // Casting from an f64 to an f32 will produce the closest possible value (rounding strategy unspecified)
+    // NOTE: currently this will cause Undefined Behavior if the value is finite but larger or smaller than the
+    // largest or smallest finite value representable by f32. This is a bug and will be fixed.
+    #[cfg(not(all(target_os = "none", target_arch = "x86_64")))]
+    fn wrap_into(self) -> f32 {
+        self as f32
+    }
+}
 
 impl WrapInto<F32> for F64 {
     fn wrap_into(self) -> F32 {
-        (f64::from(self) as f32).into()
+        <f64 as WrapInto<f32>>::wrap_into(self.into()).into()
     }
 }
 
