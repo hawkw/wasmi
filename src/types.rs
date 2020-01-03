@@ -113,6 +113,7 @@ impl ValueType {
 /// See [`ImportResolver`] for details.
 ///
 /// [`ImportResolver`]: trait.ImportResolver.html
+#[derive(Debug)]
 pub struct GlobalDescriptor {
     value_type: ValueType,
     mutable: bool,
@@ -145,6 +146,7 @@ impl GlobalDescriptor {
 /// See [`ImportResolver`] for details.
 ///
 /// [`ImportResolver`]: trait.ImportResolver.html
+#[derive(Debug)]
 pub struct TableDescriptor {
     initial: u32,
     maximum: Option<u32>,
@@ -175,6 +177,7 @@ impl TableDescriptor {
 /// See [`ImportResolver`] for details.
 ///
 /// [`ImportResolver`]: trait.ImportResolver.html
+#[derive(Debug)]
 pub struct MemoryDescriptor {
     initial: u32,
     maximum: Option<u32>,
