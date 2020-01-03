@@ -97,6 +97,8 @@
 #![warn(missing_docs)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
+#![cfg_attr(all(target_os = "none", target_arch = "x86_64"), feature(asm))]
+
 #[cfg(not(feature = "std"))]
 #[macro_use]
 extern crate alloc;
