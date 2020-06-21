@@ -364,13 +364,13 @@ impl WrapInto<f32> for f64 {
         let double = self.to_bits();
         let float: u32;
         unsafe {
+            // This is _probably_ a bad idea...
             asm!("
                 movq xmm0, rdi
                 cvtsd2ss xmm0, xmm0
-                movd eax, xmm0"
-                : "={eax}"(float)
-                : "{rdi}"(double)
-                :: "intel"
+                movd eax, xmm0",
+                in("rdi") double,
+                out("eax") float,
             );
         }
         f32::from_bits(float)
