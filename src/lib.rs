@@ -98,7 +98,6 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 #![allow(clippy::len_without_is_empty)]
 #![allow(clippy::new_ret_no_self)]
-#![cfg_attr(all(target_os = "none", target_arch = "x86_64"), feature(asm))]
 
 #[cfg(not(feature = "std"))]
 #[macro_use]

@@ -365,7 +365,7 @@ impl WrapInto<f32> for f64 {
         let float: u32;
         unsafe {
             // This is _probably_ a bad idea...
-            asm!("
+            core::arch::asm!("
                 movq xmm0, rdi
                 cvtsd2ss xmm0, xmm0
                 movd eax, xmm0",
